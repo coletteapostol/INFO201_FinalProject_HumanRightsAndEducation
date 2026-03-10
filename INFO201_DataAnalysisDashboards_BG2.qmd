@@ -1,0 +1,543 @@
+---
+title: "Human Rights and Education Around the World"
+author: "Mary Hale, Josue Villalobos, Colette Apostol"
+format: 
+  dashboard:
+    logo: "https://ischool.uw.edu/sites/default/files/inline-images/logo-black.jpg"
+    theme: simplex
+    orientation: rows
+    scrolling: true
+    fill: false
+    embed-resources: true
+---
+
+## Loading Libraries and Data
+
+```{r}
+#| output: false
+library(tidyverse)
+library(dplyr)
+library(plotly)
+library(mapproj)
+library(maps)
+library(DT)
+
+human_rights_index_df <- read.csv("human-rights-index-vdem.csv")
+years_schooling_df <- read.csv("years-of-schooling.csv")
+
+# join the two datasets
+human_rights_years_schooling_df <- human_rights_index_df |> 
+  inner_join(years_schooling_df, join_by(Entity, Year))
+
+# countries only dataset
+countries_only_df <- human_rights_years_schooling_df |> 
+  filter(!(Entity %in% c("Africa","Asia", "Europe", "South America", 
+                         "North America", "Oceania", "World")))
+
+
+# continents only dataset
+continents_only_df <- human_rights_years_schooling_df |> 
+  filter(Entity %in% c("Africa","Asia", "Europe", "South America", 
+                       "North America", "Oceania"))
+
+continents_only_df <- continents_only_df |> 
+  select(Entity, Year, Human.Rights.Index, Average.years.of.schooling)
+
+
+```
+
+# Project Overview
+
+## Row 1 {.flow}
+
+::: card
+![photo of a crowd holding up their hands with the peace sign.](humanrights.jpg){.fill}
+:::
+
+## Row 2 {.flow}
+
+::: {.card title="Project Overview" fill="false"}
+We are interested in exploring the relationship between education rates and human rights on a global scale. We plan to look at countries' and continents' human rights indices and compare them to average years of schooling rates throughout the globe. The data we will be looking at is from Our World in Data and analyzes each country’s human rights index score as of 2024. Our World in Data scores each country on whether its people are free based on the presence of things such as government torture, forced labor, and whether their citizens enjoy human liberties. The human rights index scale ranges from 0.0 to 1.0, with 1.0 being that human rights are heavily protected and respected by the country and a 0 being that human rights are not being respected. We also gathered data from Our World in Data that compared each country's average number of years adults aged 25 and older have spent in formal school. 
+
+Sources:
+
+-   Years of schooling: <https://archive.ourworldindata.org/20260122-091445/grapher/years-of-schooling.html?metric_type=average_years_schooling&level=all&sex=both>
+
+-   Human rights index: <https://ourworldindata.org/grapher/human-rights-index-vdem>
+:::
+
+## Row 3 {.flow}
+
+::: {.card title="Guiding questions in our research:" fill="false"}
+1.  **Is there a correlation between the countries and/or continents' human rights index and average years of schooling?**
+2.  **Have human rights improved over time / How do different continents compare in human rights improvement over time?**
+3.  **Are there outliers in the data?**
+    1.  **Which areas of the globe have the lowest human rights index and the highest education?**
+    2.  **Which areas of the globe have the lowest education and the highest human rights index?**
+:::
+
+## Row 4 {.flow}
+::: {.card title="Hypothesis, Reasoning and Background Behind our Research" fill="false"}
+**What we believe:**
+We hypothesize that countries that have a lower human rights index score will also have lower rates of higher education. 
+
+**Why?**
+
+We suspect that this might be the case because education cultivates power. School encourages people to be curious, think, and learn how to articulate their thoughts. Thus, citizens with more education may tend to be more equipped to push back against authoritarianism or policies they disagree with, such as ones that are not human rights-based. To limit pushback and uprising, government officials might not invest in their country’s educational system as a method to limit and control communities. Additionally, in the article “Why Access to Education is Key to Systemic Equality” published by the American Civil Liberties Union (ACLU), it is argued that an education is foundational for a kid's and young adult’s future. For instance, an education can help inform individuals on how to vote. By participating in democratic processes, one can express in favor or against for policies that might impact their ability to exercise their human rights in their daily lives. 
+
+We argue that education is the foundation of being able to articulate one's needs. In school, we learn how to speak, write, and argue, all skills extremely important to have when outside forces like governments try to strip away one’s rights. Thus, we are excited to learn and see if places that have low education levels among adults also have low ratings of protecting human rights, potentially because the government is trying to limit ordinary people’s ability to speak up and thus have power. 
+
+
+Link to website: https://www.aclu.org/news/racial-justice/why-access-to-education-is-key-to-systemic-equality
+:::
+
+## Row 5 {.flow}
+::: {.card title="Why is our analysis answering an important question?" fill="false"}
+Our analysis is going to help us get a look into what factors influence a country’s human rights index. Education disparities are prevalent across the world, and we want to see if a country's prioritization of education influences how much the country prioritizes human rights. In addition, we wanted to see how lack of education is tied to an increase or decrease in the human rights index. Hopefully by looking at patterns between education rates and country’s human rights index scores, we will be able to see if education levels are a leading cause for why some countries have a higher or lower human rights index.
+:::
+
+
+## Row 6 {.flow}
+
+::: {.card title="Ethical questions and limitation to consider:" fill="false"}
+An ethical question and limitation we face with our current dataset is overgeneralization. We understand that the conclusion we intend to derive is very surface-level, and we do not want to frame it as, because you are uneducated, because you lack governance and logic or because you need to work instead of study. Of course, we never state that throughout our project; however, we are doing our best to frame our project in the light of educating others, not pointing fingers as to who or what is responsible for any disparity. 
+:::
+
+## Row 7 {.flow}
+
+::: {.card title="Data Context" fill="false"}
+The data we chose was significant to the bigger questions we asked during this assignment, as the data does not only look at a general basis of education or one specific human rights index, but it is holistic. We chose our data sets as these data sets have been vetted by many and have gone through a thorough collection process. This data touches upon countries' indexes that have been decided by cross-continental organizations, and that touch upon education level. Our data fits the bigger picture of our question because it gives us a bird's-eye view of what exactly we're dealing with when it comes to Human Rights and education. 
+:::
+
+## Row 8 {.flow}
+
+::: {.card title="About The Data Source: Our World In Data" fill="false"}
+Years in schooling data set:
+Where to get more information on the dataset: https://archive.ourworldindata.org/20260122-091445/grapher/years-of-schooling.html?metric_type=average_years_schooling&level=all&sex=both
+
+About the data: 
+The average years of schooling dataset is from Our World In Data. The data was compiled from 1990 through 2023 from countries across the globe. Our World In Data measured the average years of schooling (spent in formal education) among adults in 2023 in countries across the globe. Our World In Data converts each person's highest completed education level into years. In addition, the data comes from censuses and surveys of adults aged 25 and older, including only formal education starting from primary school. Higher values indicate a population with stronger educational foundations, but the measure does not account for education quality or informal learning. Therefore, a shortcoming of this dataset is that it overgeneralizes what counts as education in countries. 
+
+Human rights index:
+Where to get more information on the dataset: https://ourworldindata.org/grapher/human-rights-index-vdem
+
+About the data:
+This data is compiled from 1789 through 2023, by Our World In Data, from countries all over the world. Our World In Data created a human rights index where they scored each country to which the country’s citizens are free from government torture, political killings, and forced labor. In addition, The data focuses on specific groups and people’s economic and social rights, for example, Women’s Rights, LGBTQ+ Rights, Food, Health, and Education. It is made up of three sub-indices: physical integrity rights, private civil liberties, and political civil liberties. The index ranges from 0 to 1, with the higher scoring being associated with more human rights. Furthermore, the data provide two kinds of regional human rights index averages: country averages and population-weighted averages. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience. A potential shortcoming from our human rights dataset is that policies or governments may falsely report or appear from the outside that they are respecting human rights (thus giving them a higher human rights index score). However, inhumane or non-human rights behavior might be happening in closed doors and not getting reported about. In addition, incidents that are safer or more comfortable to share are often reported. For example, many victims to sexual assault or violence have a harder time publicly vocalizing the situation out of fear and public shame. Thus, these types of stories that would adjust the human rights scale sometimes are not shared which could lead to an inaccurate human rights index score in a country. 
+:::
+
+## Row 9 {.flow}
+
+::: {.card title="About The Data Souce: Our World In Data" fill="false"}
+Our World in Data is an organization based in the UK that seeks to share data across the world to support knowledge and understanding. The cover topics range from poverty, disease, hunger, climate change, war, existential risks, and inequality. It is these large problems that Our World in Data focuses on. Their data acquisition is thanks to the work of thousands of researchers around the world. They believe that a key reason why we fail to achieve the progress we are capable of is that we do not make enough use of this existing research and data: the important knowledge is often stored in inaccessible databases, locked away behind paywalls, and buried under jargon in academic papers. Our World in Data is produced as a collaborative effort between researchers at the University of Oxford, who are the scientific contributors of the website content, and the non-profit organization Global Change Data Lab, which owns, publishes, and maintains the website and the data tools. At the University of Oxford, the research team is affiliated with the Oxford Martin Programme on Global Development, where the mission is to produce academic research on the world’s largest problems based on the empirical analysis of global data. They are a non-profit organization and are funded through grants and reader donations. 
+
+Our World in Data is widely considered a highly reliable and authoritative source for tracking long-term global trends in health, environment, and development. 
+Source Transparency: OWID acts as a secondary processor, clearly citing primary data sources such as the UN, World Bank, and WHO.
+Rigorous Curation: They clean, standardize, and visualize data to make complex information accessible.
+Expert Review: The team consists of researchers and scientists, often from Oxford.
+Extensive Use: Trusted by major media outlets (e.g., The New York Times, The Economist) and governments for data on topics like COVID-19.
+
+
+Overall, the data is clear, reliable, and has similar assets to each other, like years, countries, and continents, related to their respective topics.
+:::
+
+# Question 1
+
+## Row 1 {height="20%"}
+
+::: {.card title="Question 1" .flow}
+Is there a correlation between the countries and/or continents human rights index and average years of schooling?
+:::
+
+## Row 2 {height="80%"}
+### Column {width="60%"}
+```{r}
+#| fig-alt: "A scatterplot that shows Average Human Rights Index on the x-axis and Average Years of Schooling on the y-axis for each country/entity and each decade."
+#| title: "Figure 1. Scatterplot"
+# Creates a new column for decades that shows the decade of each row
+countries_only_decades_df <- countries_only_df |> 
+    mutate(Decade = Year - Year %% 10)
+
+# Creates a new dataframe that displays 
+countries_only_decades_df <- countries_only_decades_df |> 
+  group_by(Decade, Entity, World.region.according.to.OWID) |> 
+  summarize(Average.Human.Rights.Index = mean(Human.Rights.Index), 
+            Average.Average.years.of.schooling = mean(Average.years.of.schooling), .groups = "drop") 
+
+
+# Creates a scatterplot of average years of school and human rights
+school_years_vs_hri_plot <- ggplot(data = countries_only_decades_df) +
+  geom_point(mapping = aes(x = Average.Human.Rights.Index, 
+                           y = Average.Average.years.of.schooling, 
+                           color = factor(World.region.according.to.OWID), 
+                           text = paste("Country:", Entity, "\n",
+                                        "Decade:", Decade, "\n",
+                                        "Human Rights Index:", Average.Human.Rights.Index, "\n",
+                                        "Average Years of Schooling:", Average.Average.years.of.schooling))) +
+  
+  # add a best fit line to the scatter plot - is there a correlation? 
+                           geom_smooth(aes(x = Average.Human.Rights.Index, 
+                           y = Average.Average.years.of.schooling, method = "lm")) +
+  # add labels for the plot
+  labs(
+    x = "Average Human Rights Index",
+    y = "Average Years of Schooling",
+    color = "Continent",
+    title = "Average Human Rights Index vs. Years of Schooling per Country and Decade")
+
+# make the plot interactive
+ggplotly(school_years_vs_hri_plot, tooltip = "text")
+```
+
+### What are the top 10 countries for human rights and what are their years of schooling compared to the lowest 10?
+
+```{r}
+# Creates a dataframe that summarizes for each entity their years of schooling and HRI
+extreme_10_df <- countries_only_df |>
+             group_by(Entity, World.region.according.to.OWID) |>
+             summarize(Average.Human.Rights.Index = mean(Human.Rights.Index),
+                       Average.Years.Of.Schooling = mean(Average.years.of.schooling))
+
+```
+
+```{r}
+#| title: "Top 10 countries for human rights averaged from 1990-2023"
+# Display the top 10 countries for human rights averaged from 1990-2023
+datatable(head(arrange(extreme_10_df, desc(Average.Human.Rights.Index)), 10))
+```
+
+```{r}
+#| title: "Bottom 10 countries for human rights averaged from 1990-2023"
+# Display the bottom 10 countries for human rights averaged from 1990-2023
+datatable(head(arrange(extreme_10_df, Average.Human.Rights.Index), 10))
+
+```
+
+## Row 3 {.flow}
+::: {.card title="Reasoning for Visualization" .flow}
+This scatterplot allows clear visualization of the relationship between Human Rights Index and Average Years of Schooling for each instance of a country during a certain decade. The best-fit line provides a more clear way to see this relationship, showing a stronger relationship as both values increase. The grey shaded area around the best-fit line provides the confidence interval for the line, adding additional context. 
+::: 
+
+# Question 2
+
+## Row 1 {height="20%"}
+
+::: {.card title="Question 2"}
+How have human rights and average years of schooling changed over time? (with a focus on human rights)
+:::
+
+## Row 2 {height="80%"} {.tabset}
+
+### Figures 2 and 3
+
+```{r}
+#| title: Figure 2. How have human rights changed over time globally?
+# Get average of human rights index in the world for each year 
+average_hri_df <- human_rights_years_schooling_df |> group_by(Year) |> summarize(Average.Human.Rights.Index = mean(Human.Rights.Index))
+
+# plot year as x and index as y
+world_hri_plot <- ggplot(data = average_hri_df) +
+  geom_line(mapping = aes(x = Year,
+                          y = Average.Human.Rights.Index),
+                          color = "blue") +
+  labs(
+    x = "Year",
+    y = "World Average Human Rights Index",
+    title = "World Average Human Rights Index Over Time")  +
+                             theme_minimal()
+
+ggplotly(world_hri_plot)
+```
+
+```{r}
+#| title: Figure 3. How has average years of schooling changed over time globally?
+# Get average of human rights index in the world for each year 
+average_ys_df <- human_rights_years_schooling_df |> group_by(Year) |> summarize(Average.Years.Schooling = mean(Average.years.of.schooling))
+
+# plot year as x and index as y
+world_ys_plot <- ggplot(data = average_ys_df) +
+  geom_line(mapping = aes(x = Year,
+                          y = Average.Years.Schooling),
+                          color = "blue") +
+  labs(
+    x = "Year",
+    y = "World Average Years of Schooling",
+    title = "World Average Years of Schooling Over Time")  +
+                             theme_minimal()
+
+ggplotly(world_ys_plot)
+```
+
+### Figures 4 and 5
+
+How do different continents compare in human rights improvement over time?
+
+```{r}
+#| title: Figure 4. How have human rights progressed in different continents over time?
+# Get average of human rights index for each continent and year 
+# Filter out the summary rows where continent is Entity
+continents_hri_df <- human_rights_years_schooling_df |> group_by(World.region.according.to.OWID, Year) |> summarize(Average.Human.Rights.Index = mean(Human.Rights.Index)) |> filter(World.region.according.to.OWID != '')
+
+# plot year as x and index as y
+world_hri_plot <- ggplot(data = continents_hri_df) +
+  geom_line(mapping = aes(x = Year,
+                          y = Average.Human.Rights.Index,
+                          color = World.region.according.to.OWID)) +
+                          scale_x_continuous(breaks =seq(1990, 2023, 5)) +
+  labs(
+    x = "Year",
+    y = "Average Human Rights Index",
+    title = "Average Human Rights Index Over Time Per Continent")  +
+                             theme_minimal()
+
+ggplotly(world_hri_plot)
+```
+
+```{r}
+#| title: Figure 5. How do each continents average human rights index compare in 1990 and 2023?
+# bar plot comparing each continents first to their most recent hri
+continent_start_to_end_df <- human_rights_years_schooling_df |> 
+                             filter(World.region.according.to.OWID != '') |>
+                             filter(Year == 1990 | Year == 2023) |>
+                             group_by(World.region.according.to.OWID, Year) |>
+                             summarize(Average.Human.Rights.Index = mean(Human.Rights.Index), 
+                                       .groups = "drop")
+
+hri_change_plot <- ggplot(continent_start_to_end_df,
+       aes(x = World.region.according.to.OWID,
+           y = Average.Human.Rights.Index,
+           fill = factor(Year))) +
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  labs(
+    title = "Change in Human Rights Index by Continent",
+    x = "Continent",
+    y = "Average Human Rights Index",
+    fill = "Year"
+  ) +
+  theme_minimal()
+
+ggplotly(hri_change_plot)
+
+```
+
+### Figure 6
+
+```{r}
+#| fig-alt: "A world map color coded by change in human rights index from 1990 to 2023."
+#| title: "Figure 6. World Map"
+# Create a score for how the continent has improved over time 
+country_summary_df <- countries_only_df |> group_by(Entity) |> 
+                      summarize(initial.hri = first(Human.Rights.Index), 
+                                final.hri = last(Human.Rights.Index), 
+                                hri.change = final.hri - initial.hri)
+
+# Retrieve map data
+world_map <- map_data("world")
+
+# Edit names of countries to match in the dataframes before joining 
+country_summary_df$Entity <- replace(country_summary_df$Entity, country_summary_df$Entity == "United Kingdom", "UK")
+country_summary_df$Entity <- replace(country_summary_df$Entity, country_summary_df$Entity == "United States", "USA")
+country_summary_df$Entity <- replace(country_summary_df$Entity, country_summary_df$Entity == "Democratic Republic of Congo", "Democratic Republic of the Congo")
+country_summary_df$Entity <- replace(country_summary_df$Entity, country_summary_df$Entity == "Cote d'Ivoire", "Ivory Coast")
+country_summary_df$Entity <- replace(country_summary_df$Entity, country_summary_df$Entity == "Congo", "Republic of Congo")
+
+# Join country summary with map data
+world_map_df <- world_map |>
+  left_join(country_summary_df, by = c("region" = "Entity"))
+
+
+# Create plot
+world_map <- ggplot(world_map_df) +
+  geom_polygon(mapping = aes(x = long, 
+                             y = lat, 
+                             group = group,
+                             fill = hri.change,
+                             text = paste("Country:", region, "\n",
+                                        "Human Rights Index 1990:", initial.hri, "\n",
+                                        "Human Rights Index 2023:", final.hri, "\n",
+                                        "Change:", hri.change))) +
+  scale_fill_continuous(low = "red",
+                        high = "green") +
+  theme_void() + 
+  labs(
+    title = "Human Rights Improvement From 1990 - 2023",
+    fill = "Change in Human Rights Index"
+  ) 
+
+# Make the plot interactive
+ggplotly(world_map, tooltip = "text")
+
+```
+
+## Row 3 {.flow}
+::: {.card title="Reasoning for Visualizations" .flow}
+Figures 2 and 3 help answer the question of how our two values of interest progressed over time, showing a clear line of change over time. Figure 4 shows Human Rights Index changing over time per continent, allowing us to visualize the differences in progression between the continents. Figure 5 more clearly compares the initial and final values for human rights in the dataset for each country. Finally, figure 6 provides a world map view with color coding, displaying the change in human rights over time for each country. This plot is a helpful visualization to have in comparing countries in relation to their geographic location. 
+::: 
+
+# Question 3
+
+## Row 1 {height="20%"}
+
+::: {.card title="Question 3"}
+Who are the outliers in the data?
+
+-   Which areas of the globe have the lowest human rights index and highest education?
+-   Which areas of the globe have the lowest education and highest human rights index?
+:::
+
+```{r}
+#Data analysis on mean, min, and max for each variable
+average_hri <- human_rights_years_schooling_df |> pull(Human.Rights.Index) |> mean()
+
+max_hri <- human_rights_years_schooling_df |> pull(Human.Rights.Index) |> max()
+min_hri <- human_rights_years_schooling_df |> pull(Human.Rights.Index) |> min()
+
+average_schooling <- human_rights_years_schooling_df |> pull(Average.years.of.schooling) |> mean()
+
+max_schooling <- human_rights_years_schooling_df |> pull(Average.years.of.schooling) |> max()
+min_schooling <- human_rights_years_schooling_df |> pull(Average.years.of.schooling) |> min()
+```
+
+::: {.card title="Summary Statistics"}
+According to the data, the maximum human rights index of a country in the globe was `r round(max_hri, 3)` and the minimum human rights index was `r round(min_hri, 3)`. The mean human rights index from Our World In Data was approximately `r round(average_hri, 3)`. 
+When observing the dataset on years in schooling across countries, the maximum average number of years an adult spends in school was around `r round(max_schooling, 3)` years while the minimum value was around `r round(min_schooling, 3)` years. The data also reveals that the mean average number of years of schooling an adult has around `r round(average_schooling, 2)` years.
+:::
+
+## Row 2 {.tabset height="80%"}
+
+### Distributions
+```{r}
+#| fig-alt: "A distribution of the average years of schooling per country."
+#| title: "Figure 7. Human Rights Distribution"
+# Make a box plot for HRI per continent
+avg_schooling_plot <- ggplot(countries_only_df, aes(x = World.region.according.to.OWID, y = Human.Rights.Index)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Human Rights Index by Continent",
+    x = "Continent",
+    y = "Human Rights Index"
+  )
+
+ggplotly(avg_schooling_plot)
+```
+
+```{r}
+#| fig-alt: "A distribution of the human rights index per country."
+#| title: "Figure 8. Average Schooling Distribution"
+# Make a box plot for average years of schooling per continent
+avg_hri_plot <- ggplot(countries_only_df, aes(x = World.region.according.to.OWID, y = Average.years.of.schooling)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Average Years of Schooling by Continent",
+    x = "Continent",
+    y = "Average Years of Schooling"
+  )
+
+ggplotly(avg_hri_plot)
+```
+
+### Scatterplots
+
+```{r}
+#| fig-alt: "A scatterplot that shows the section of the years of school vs. HRI plot with high years of schooling but low HRI."
+#| title: "Figure 9. Low HRI and High Years of Schooling"
+# Creates a plot that displays the section of the years of school vs. HRI plot with high years of schooling but low HRI
+outliers_lowhri_df <- countries_only_decades_df |> filter(Decade == 2020)
+high_school_years_vs_low_hri_plot <- ggplot(data = outliers_lowhri_df) +
+  geom_point(mapping = aes(x = Average.Human.Rights.Index, 
+                           y = Average.Average.years.of.schooling, 
+                           color = factor(World.region.according.to.OWID), 
+                           text = paste("Country:", Entity, "\n",
+                                        "Decade:", Decade, "\n",
+                                        "Human Rights Index:", Average.Human.Rights.Index, "\n",
+                                        "Average Years of Schooling:", Average.Average.years.of.schooling))) +
+  coord_cartesian(xlim = c(0, 0.25), ylim = c(10, 13)) +
+  # add labels for the plot
+  labs(
+    x = "Average Human Rights Index",
+    y = "Average Years of Schooling",
+    color = "Continent",
+    title = "Countries With High Years of Schooling and Low Human Rights")
+
+# make the plot interactive
+ggplotly(high_school_years_vs_low_hri_plot, tooltip = "text")
+
+```
+
+```{r}
+#| fig-alt: "A scatterplot that shows the section of the years of school vs. HRI plot with low years of schooling but high HRI."
+#| title: "Figure 10. High HRI and Low Years of Schooling"
+# Creates a plot that displays the section of the years of school vs. HRI plot with low years of schooling but high HRI
+outliers_lowschool_df <- countries_only_decades_df |> filter(Decade == 2020)
+low_school_years_vs_high_hri_plot <- ggplot(data = outliers_lowschool_df) +
+  geom_point(mapping = aes(x = Average.Human.Rights.Index, 
+                           y = Average.Average.years.of.schooling, 
+                           color = factor(World.region.according.to.OWID), 
+                           text = paste("Country:", Entity, "\n",
+                                        "Decade:", Decade, "\n",
+                                        "Human Rights Index:", Average.Human.Rights.Index, "\n",
+                                        "Average Years of Schooling:", Average.Average.years.of.schooling))) +
+  coord_cartesian(xlim = c(0.75, 0.9), ylim = c(0, 5)) +
+  # add labels for the plot
+  labs(
+    x = "Average Human Rights Index",
+    y = "Average Years of Schooling",
+    color = "Continent",
+    title = "Countries With Low Years of Schooling and High Human Rights")
+
+# make the plot interactive
+ggplotly(low_school_years_vs_high_hri_plot, tooltip = "text")
+
+```
+
+## Row 3 {.flow}
+::: {.card title="Reasoning for Visualizations" .flow}
+Figures 7 and 8 displaying the distributions of both Human Rights Index and Average Years of Schooling per continent provide a clear and simple way to visualize outliers in the data. Figures 9 and 10 show the specific sections of the primary scatterplot of Average Years of Schooling vs. Average Human Rights Index per country in 2020 where the two primary variables of interest are not positively correlated are also helpful in visualizing outliers. 
+::: 
+
+# Conclusion
+## Row 1 {.flow}
+::: {.card title="Is there a correlation?" .flow}
+We hypothesized that countries that have fewer human rights and a lower human rights index score will also have lower rates of higher education. The data suggests that it is more complicated. The relationship between the amount of schooling an average adult has in a country to a country’s human rights index is not strong. For instance, in Figure 1, the best fit line from average human rights index score 0.0 to about 0.6 is almost flat. Interestingly enough, the best fit line dramatically increased with the relationship between schooling and the human rights index becoming steeper once the average human rights index surpassed 0.75. Countries that had both the highest number of years in education and the human rights index were mostly in Europe, including Germany, Sweden, and Finland. But there were also cases such as Benin, Sao Tome and Principe, and Senegal, which have a low education rate (average years in school being less than five years) but high human rights index scores. Thus, what the data suggests is that school might be one factor in increasing or decreasing a country's human rights index, but there are other factors that need to be explored that are influencing human rights index scores. The correlation between the country’s human rights index and average years of schooling was not always consistent and strong. 
+::: 
+
+## Row 2 {.flow}
+::: {.card title="Change over time" .flow}
+The data reveal how the world average human rights index has increased steadily from 1990 to 2012, as seen in Figure 2. Yet, post 2012, the human rights index has been declining, and the 2023 average human rights index score of approximately 0.67 is the same as what it was in 1997. Thus, this data suggests that fewer countries are starting to prioritize human rights as of this past decade. On the other hand, the prioritization of education is only increasing in many countries, as seen in Figure 3, with the world’s average years of schooling steadily increasing over decades. 
+
+There are also patterns between the different continents when comparing the different continents’ human rights index scores. As noted in Figure 4, Asia and Africa were similar in that their average human rights index in 1990 was approximately 0.46, the lowest continent index compared to the rest of the globe. Every continent has seen an increase in the human rights index; Oceania saw a minuscule decrease, but the region was already leading in having one of the highest indexes (around 0.86). When comparing data from 1990 to 2023, in Figure 5, Africa has had the largest change in average human rights index (from around 0.46 to approximately 0.60) compared to any other continent. 
+::: 
+
+## Row 3 {.flow}
+::: {.card title="Outliers and The Big Takeaway" .flow}
+The data reveals that there were examples of countries that have some of the lowest human rights indexes as well as the highest education levels. As seen in Figure 6, the majority of the countries that fell into this category were from the continent of Asia. Examples of countries with ten plus years in school but a low average human rights index score (between 0.0 and 0.3 range) are Turkmenistan, Uzbekistan, Saudi Arabia, Belarus, and Iran. Cuba and Nicaragua were two interesting outliers since they also fell into this category, yet are located in North America.
+
+There were also regions of the globe that had some of the lowest average number of years in schooling, yet had a very high human rights index. Most of the countries that fell into this category (five or fewer years in education on average and an average human rights index score of between 0.75 and 0.95) were located in Africa. Some examples of this, as seen in Figure 7, are Benin, Gambia, Senegal, and Liberia. There were also a few countries apart from Oceania and Asia that qualified in this category. 
+
+Overall, combining Figures 6 and 7, the data suggest that the average years of schooling for a country doesn’t necessarily determine a country’s human rights index. In addition, just because a country doesn’t prioritize education, as seen with a low number of years in school for an average adult, doesn’t mean the country will thus have a low human rights index. The data suggest that the relationship between years in education and the human rights index is more complex. Thus, we believe that our data exploration is not showing the full picture as to why certain countries have lower or higher average human rights index scores. By just looking at the average years of schooling in a country, we are overestimating how influential education can be in advocating for one’s human rights. For example, one might go to school for ten years, but their school doesn’t teach them content related to how to advocate for their human rights. Or, instead of nurturing curiosity and self-advocacy, their school restricts students from arguing with the government, which has control over policies related to human rights. Thus, this data exploration has made us rethink what the big factor that is impacting why a country has a high index score is. 
+:::
+
+## Row 4 {.flow}
+::: {.card title="Future steps to better answer our big question…" .flow}
+In the future, we would like to explore how democracy and corruption and how those two influence a human rights index. We wonder if countries that are democratic or have a process similar to that have higher index scores. Through the democratic processes, people get to vote who represents them, and thus the people have more control over what is brought up in government, such as their human rights. We are also interested in how corrupt a government is, such as government officials cheating in elections or stealing money. We would look to see if there is any data on how common corruption is in a country, and if countries with more cases of corruption have a lower human rights index because their officials are taking advantage of their citizens. 
+:::
+
+## Row 5 {.flow}
+::: {.card title= "Coding Notes" .flow}
+No tools from outside of class were used in our data analysis and dashboard creation. 
+:::
+
+# Team Information
+::: {.card title="Mary Hale"}
+Mary Hale (Jackson School of International Studies, University of Washington; mhale25@uw.edu) is interested in using data to get a deeper understanding of human behavior and experiences across the globe. 
+:::
+
+::: {.card title="Josue Villalobos"}
+Josue Villalobos (Foster School of Business, University of Washington; josuev@uw.edu) is interested in data to gain a deeper understanding of how data-driven solutions are tackled.
+:::
+
+::: {.card title="Colette Apostol"}
+Colette Apostol (Information School, University of Washington: cta345@uw.edu) is interested in using data to support the healthcare field and understand disparities in quality care. 
+:::
