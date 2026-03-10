@@ -1,0 +1,291 @@
+---
+title: "Human Rights Index and Average Years of School Per Country"
+author: "Mary Hale, Josue Villalobos, Colette Apostol"
+format: 
+  html:
+    embed-resources: true
+    theme: default
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+## Section I: Providing Data Context for Data Set 1
+
+### Data Source:
+
+Human rights index: https://ourworldindata.org/grapher/human-rights-index-vdem
+
+### Where does the data come from?
+
+Our World in Data is an organization based in the UK that seeks to share data across the world to support knowledge and understanding. The cover topics range from poverty, disease, hunger, climate change, war, existential risks, and inequality. It is these large problems that Our World in Data focuses on. Their data acquisition is thanks to the work of thousands of researchers around the world. They believe that a key reason why we fail to achieve the progress we are capable of is that we do not make enough use of this existing research and data: the important knowledge is often stored in inaccessible databases, locked away behind paywalls, and buried under jargon in academic papers. The goal of their work is to make this knowledge accessible and understandable to empower those working to build a better world. Our World in Data is produced as a collaborative effort between researchers at the University of Oxford, who are the scientific contributors of the website content, and the non-profit organization Global Change Data Lab, which owns, publishes, and maintains the website and the data tools. At the University of Oxford, the research team is affiliated with the Oxford Martin Programme on Global Development, where the mission is to produce academic research on the world’s largest problems based on the empirical analysis of global data. They are a non-profit organization and are funded through grants and reader donations.
+
+#### Why is Our World in Data reliable?
+
+Our World in Data is widely considered a highly reliable and authoritative source for tracking long-term global trends in health, environment, and development.
+
+-   Source Transparency: OWID acts as a secondary processor, clearly citing primary data sources such as the UN, World Bank, and WHO.
+
+-   Rigorous Curation: They clean, standardize, and visualize data to make complex information accessible.
+
+-   Expert Review: The team consists of researchers and scientists, often from Oxford.
+
+-   Extensive Use: Trusted by major media outlets (e.g., The New York Times, The Economist) and governments for data on topics like COVID-19.
+
+### Data Meaning:
+
+#### How are the two data sets relevant to each other?
+
+The data we have chosen for this project centers around years of schooling and the human rights index.  Both datasets are relevant to each other as they overlap in many ways, such as having columns labeled entity (country) and year. Our project goal is to see if there are any interlinks between the access to education in the country and the human rights index that the country received. This is an interesting relationship to explore–human rights relative to education levels–because education is the foundation of being able to articulate one's needs. In school, we learn how to speak, write, and argue, all skills extremely important to have when outside forces like governments try to strip away one’s rights. Thus, we are excited to learn and see if places that have low education levels among adults also have low ratings of protecting human rights, potentially because the government is trying to limit ordinary people’s ability to speak up and thus have power. 
+
+#### What does the data represent?
+
+##### *The first data highlight the following:*
+
+-   The data focuses on specific groups and people’s economic and social rights, for example, Women’s Rights, LGBT+ Rights, Food, Health, and Education will be more useful.
+
+-   It is made up of three sub-indices: physical integrity rights, private civil liberties, and political civil liberties.
+
+-   The data provide two kinds of regional averages: country averages and population-weighted averages. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience.
+
+Overall, the data is clear, reliable, and has similar assets to each other like years, countries, and continents, related to their respective topics.
+
+### Data Join:
+
+We intend to join the data on the columns 'Entity' and 'Year'. This data set has the same two columns as the second data set, which reference the country/continent in the 'Entity' column and the year the data was collected for in the 'Year' column. Since the columns are the same and contain the same data type, we would not need to perform any cleaning before joining.
+
+### Data Observations:
+
+#### *Human Rights Index*
+
+#### Our code:
+
+```{r}
+human_rights_index_df <- read.csv("human-rights-index-vdem.csv")
+glimpse(human_rights_index_df)
+```
+
+#### About the data set:
+
+In the Our World In Data Human Rights Index data set, the column names include: entity (the name of the country), code (the abbreviation for the country), year, human rights index, and region according to OWID (the continent the country resides in). There are 34,753 rows in the data set. A country will have many rows, but different data in the year and human rights index since the Our World In Data has been tracking rights index in countries for decades. This data set also calculated the human rights index for each continent based on all the human rights index scores of each country. In the entity column, the continents are labeled like “Asia” or “Africa”. Each row has a human rights index score for the continent in a specific year. Since the data is looking at continents, there is no value in the code or region according to the OWID column. There are no missing or implausible values in the Our World In Data Human Rights index. The Our World In Data is a reliable source. 
+
+#### *Example of data:*
+
+##### *1. Looks at the first 15 rows of the data set*
+
+```{r}
+head(human_rights_index_df, 15)
+```
+
+##### *2. Looks at 5 rows of data that represent the human rights index of the continent Asia from 1908 to 1912.*
+
+```{r}
+human_rights_index_df[1201:1205, ]
+```
+
+### Data Issues:
+
+There are no missing or implausible values in the variables we will be joining or assessing. The only thing to look out for is that the 'Entity' column combines country specific data, overall continent data, and data summarized for the entire World. While they still count as different entities, they are a mix of different classifications, which may make data analysis confusing.
+
+## Section II: Providing Data Context for Data Set 2 - Average Years of Schooling
+
+### Data Source:
+
+Years of schooling: https://archive.ourworldindata.org/20260122-091445/grapher/years-of-schooling.html?metric_type=average_years_schooling&level=all&sex=both
+
+### Where does the data come from?
+
+See above for explanation on Our World In Data.
+
+### Data Meaning:
+
+#### What does the data represent?
+
+##### *The second data highlight the following:*
+
+-   This indicator shows the average number of years that adults in a country have spent in formal education.
+
+-   It reflects the overall educational attainment of the population based on what they have already completed.
+
+-   The calculation converts each person's highest completed education level into years.
+
+-   The data comes from censuses and surveys of adults aged 25 and older, including only formal education starting from primary school.
+
+-   Higher values indicate a population with stronger educational foundations, but the measure does not account for education quality or informal learning.
+
+### Data Join:
+
+We intend to join the data on the columns 'Entity' and 'Year'. This data set has the same two columns as the first, which reference the country/continent in the 'Entity' column and the year the data was collected for in the 'Year' column. Since the columns are the same and contain the same data type, we would not need to perform any cleaning before joining.
+
+### Data Observations:
+
+#### Our code:
+
+```{r}
+years_schooling_df <- read.csv("years-of-schooling.csv")
+glimpse(years_schooling_df)
+```
+
+#### About the data:
+
+Currently, our newest data set has more than a thousand rows, and our columns are as follows: years in school, country, and average years of schooling. Now we anticipate that we will need to shorten this, which is why we are proposing to move forward with a continent-based approach. An example of the data is as follows:
+
+#### *Example of data:*
+
+##### *1. Looks at the first 6 rows of the data set*
+
+```{r}
+head(years_schooling_df)
+```
+
+### Data Issues:
+
+There are no missing or implausible values in the variables we will be joining or assessing. Again, as with the first data set, the only thing to look out for is that the 'Entity' column combines country specific data, overall continent data, and data summarized for the entire World. While they still count as different entities, they are a mix of different classifications, which may make data analysis confusing.
+
+## Section III: Joining the Data
+
+### Data join:
+
+We joined the data by entity and year. There were no features we needed to change to ensure a successful joining.
+
+```{r}
+human_rights_years_schooling_df <- human_rights_index_df |> 
+  inner_join(years_schooling_df, join_by(Entity, Year))
+
+glimpse(human_rights_years_schooling_df)
+
+```
+
+### Information about the columns for each data set:
+
+For the average years in schooling, the [Our World in Data](https://archive.ourworldindata.org/20260122-091445/grapher/years-of-schooling.html?tab=table&metric_type=average_years_schooling&level=all&sex=both) explains what the column “Average years in school” means. The most relevant variable is the average years in school but also the entity (as known as country) and the year column is important. This data will help us compare the average years of schooling among adults in a country in a certain year. 
+
+For the human rights index data set, the [Our World in Data](https://ourworldindata.org/grapher/human-rights-index-vdem?tab=table#sources-and-processing) explains more information about the columns of the data in the “What you should know about this indicator” section. The most relevant variable is the human rights index score but the entity (also known as the country) and the year column are also important. This data will help us see how much a country values and respects their citizens human rights and how that has changed over the years.
+
+### Potential biases:
+
+A potential bias from our human rights data set is that policies or governments may report or appear from the outside that they are respecting human rights (thus giving them a higher human rights index score). However, inhumane or non-human rights behavior might be happening in closed doors and not getting reported about. In addition, incidents that are safer or more comfortable to share are often reported. For example, many victims to sexual assault or violence have a harder time publicly vocalizing the situation out of fear and public shame. Thus, these types of stories that would adjust the human rights scale sometimes are not shared which could lead to an inaccurate human rights index score in a country. Similarly, larger and public incidents are reported since they are harder to hide. However, small incidents such as one individual facing government torture has a easier chance of hiding from the public since and thus not being taken in account in the country’s human rights index score. A potential bias for the average years of schooling data set is that the definition of formal education differs from different cultures and communities. Thus, in some communities some children might learn mainly from a family member (e.g. homeschooling or private tutoring) but that might not be properly represented in the data set thus skewing the data.
+
+### Does the data reflect the 8 human rights principle?
+
+Both our data sets reflect the 8 human rights principles in this paper. The data sets respect safety, privacy, and security by not giving names of the individuals who testified or filled out censuses and surveyed. In addition, each data set practices transparency and explainability through elaborating (with examples in some cases) their data and how they found the data (in this case average years of schooling and the human rights index). For example, in the human rights index the Our World In Data goes into depth about what they were looking for (research question), clarification of what the question means, and what the index scale means. Both data sets are in line with fairness, non-discrimination, professional responsibility, and human control of values through using data from multiple experts, researchers, past studies, and perspectives. Additionally, both data sets promote human values as seen with the Our World In Data mission statement which states that the organization is to help those in need across the world through providing policy advice with data-based research, such as these data sets.
+
+## Section IV: Data Wrangling
+
+First, we noticed that they mixed continents and countries both into the 'Entity' column. We decided to separate the data into country specific data, and overall continent data. There was also world data, which we removed.
+
+### Isolate Country Data
+
+```{r}
+countries_only_df <- human_rights_years_schooling_df |> 
+  filter(!(Entity %in% c("Africa","Asia", "Europe", "South America", 
+                         "North America", "Oceania", "World")))
+
+glimpse(countries_only_df)
+```
+
+### Isolate Continent Data
+
+```{r}
+continents_only_df <- human_rights_years_schooling_df |> 
+  filter(Entity %in% c("Africa","Asia", "Europe", "South America", 
+                       "North America", "Oceania"))
+continents_only_df <- continents_only_df |> 
+  select(Entity, Year, Human.Rights.Index, Average.years.of.schooling)
+
+glimpse(continents_only_df)
+```
+
+### Summary by Decades
+
+#### Reasoning behind exploring this information:
+
+We thought grouping years into decades would help to simplify and reduce the data in order to obtain more of an overview of the information. By grouping the years into decades, we also had to consolidate the other values, and we did this by taking an average.
+
+```{r}
+countries_only_decades_df <- countries_only_df |> 
+    mutate(Decade = Year - Year %% 10)
+
+countries_only_decades_df <- countries_only_decades_df |> 
+  group_by(Decade, Entity, World.region.according.to.OWID) |> 
+  summarize(Average.Human.Rights.Index = mean(Human.Rights.Index), 
+            Average.Average.years.of.schooling = mean(Average.years.of.schooling), .groups = "drop") 
+
+glimpse(countries_only_decades_df)
+```
+
+### Deviation from Average Human Rights Index
+
+#### Reasoning behind investigating this value:
+
+This value puts into perspective how each country compares to the world's average Human Rights Index based on all the years provided in the data set.
+
+```{r}
+average_hri <- countries_only_df |> pull(Human.Rights.Index) |> mean()
+countries_only_df <- countries_only_df |>
+  mutate(HRI.Deviation = Human.Rights.Index - average_hri)
+
+glimpse(countries_only_df)
+```
+
+### Plot: Human Rights Index vs. Average Years of Schooling
+
+#### Reasoning behind this graph:
+
+We made this graph to investigate the relationship between a country's average years of school for an adult and the country's human rights index. Each dot represents a unique instance of one country in one decade.
+
+```{r}
+ggplot(data = countries_only_decades_df) +
+  geom_point(mapping = aes(x = Average.Human.Rights.Index, 
+                           y = Average.Average.years.of.schooling, 
+                           color = factor(World.region.according.to.OWID))) +
+  labs(
+    x = "Average Human Rights Index",
+    y = "Average Years of Schooling",
+    color = "Continent",
+    title = "Average Human Rights Index vs. Years of Schooling per Country and Decade")
+
+```
+
+This graph is the exact same, however, it only includes the decade 2020, which should only be the years 2020-2023 per the data set.
+
+```{r}
+ggplot(data = countries_only_decades_df |> filter(Decade == 2020)) +
+  geom_point(mapping = aes(x = Average.Human.Rights.Index, 
+                           y = Average.Average.years.of.schooling, 
+                           color = factor(World.region.according.to.OWID))) +
+  labs(
+    x = "Average Human Rights Index",
+    y = "Average Years of Schooling",
+    color = "Continent",
+    title = "Average Human Rights Index vs. Years of Schooling per Country 2020-2023")
+
+```
+
+## Section V: Group Information
+
+### Main topic of interest
+
+*Lab Section: BG, Thursdays 8:30AM TA: Lexieigh A Kolakowski*
+
+We are interested in exploring what countries across the globe respect human rights and if there is any correlation to the average number of years in schooling an adult has.
+
+### Members of the group
+
+Colette Apostol \| Information School, University of Washington \| cta345\@uw.edu
+
+-   Interested in exploring data and how it can be leveraged to reveal patterns and help people, rather than harm them.
+
+Josue Villalobos \|Foster School of Business, University of Washington \| [josuev\@uw.edu](mailto:josuev@uw.edu)
+
+-   Interested in data to gain a deeper understanding of how data-driven solutions are tackled.
+
+Mary Hale \| Jackson School of International Studies, University of Washington \| mhale25\@uw.edu
+
+-   Interested in using data to get a deeper understanding of human behavior and experiences across the globe.\
+
+### Coding notes
+
+We used tools and references from class lectures and reading to support our final project execution and learning.
